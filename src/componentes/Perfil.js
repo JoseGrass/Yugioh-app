@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, TextInput, TouchableOpacity, Alert } from "react-native";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { doc, getDoc, collection, getDocs, updateDoc } from "firebase/firestore";
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Perfil() {
   const [usuarioDoc, setUsuarioDoc] = useState(null);
@@ -15,7 +16,9 @@ export default function Perfil() {
   const [fecha, setFecha] = useState("");
   const [telefono, setTelefono] = useState("");
 
+  // Cargar datos y favoritos
   const cargarDatos = async () => {
+    setCargando(true);
     try {
       const user = auth.currentUser;
       if (!user) return;
@@ -43,9 +46,12 @@ export default function Perfil() {
     }
   };
 
-  useEffect(() => {
-    cargarDatos();
-  }, []);
+  // Recargar datos cada vez que esta pantalla toma el foco
+  useFocusEffect(
+    React.useCallback(() => {
+      cargarDatos();
+    }, [])
+  );
 
   const handleGuardarCambios = async () => {
     try {
